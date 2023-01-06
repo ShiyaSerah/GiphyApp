@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeTabFragment">
+
+    <fragment
+        android:id="@+id/homeTabFragment"
+        android:name="com.ey.giphy.view.HomeTabFragment"
+        tools:layout="@layout/fragment_tab_template">
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/FirstFragment"
+        android:name="com.ey.giphy.view.GifListFragment"
+        android:label="@string/first_fragment_label"
+        tools:layout="@layout/fragment_gif_list"/>
+
+</navigation>

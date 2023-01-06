@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="fab_margin">48dp</dimen>
+    <dimen name="gif_item_height">@dimen/_150sdp</dimen>
+</resources>
