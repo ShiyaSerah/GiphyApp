@@ -1,6 +1,7 @@
 package com.ey.giphy.network
 
 import com.ey.giphy.BuildConfig
+import com.ey.giphy.constants.Constants
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -20,7 +21,11 @@ class ApiServiceGenerator {
             val okHttpClient = OkHttpClient.Builder().apply {
                 readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
                 connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-                addInterceptor(httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY))
+                addInterceptor(
+                    if (Constants.APIEnvironment.valueOf(BuildConfig.ENV) != Constants.APIEnvironment.RELEASE)
+                        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+                    else httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE)
+                )
                 addInterceptor(ConnectivityInterceptor())
             }.build()
 
@@ -28,7 +33,8 @@ class ApiServiceGenerator {
             val retrofit: Retrofit = builder.client(okHttpClient).build()
             return retrofit.create(serviceClass)
         }
-        fun getNewsService(): ApiServices {
+
+        fun getGiphyService(): ApiServices {
             return createService(ApiServices::class.java)
         }
     }

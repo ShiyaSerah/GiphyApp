@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
 import androidx.viewpager2.widget.ViewPager2
 import com.ey.giphy.GiphyApplication
 import com.ey.giphy.R
@@ -22,23 +21,18 @@ import io.reactivex.subjects.PublishSubject
 class HomeTabFragment : BaseFragment() {
     var binding: FragmentTabTemplateBinding? = null
     private var titlesArr: Array<String>? = null
-    internal var fragmentsList: Array<String>? = null
+    private var fragmentsList: Array<String>? = null
     internal var fragmentsArr: Array<Fragment?>? = null
-    internal var adapter: TabTemplateAdapter? = null
+    private var adapter: TabTemplateAdapter? = null
     private var fragment: Fragment? = null
-    private var bundle: Bundle? = null
     var publishTabChange: PublishSubject<Fragment> = PublishSubject.create()
     val currentPage = 0
-    private lateinit var navController: NavController
 
 
     companion object {
 
-        const val TAB_TITLE = "tab_title"
-        const val TAB_FRAGMENT = "tab_fragment"
         const val FRAGMENT_LIST = "fragment_list"
         const val FRAGMENT_TITLE = "fragment_title"
-        const val FRAG_FACTORY_OBJ = "FRAG_FACTORY_OBJ"
         const val BUNDLE = "bundle"
         fun getInstance(titleList: Array<String>, fragmentList: Array<String>, bundle: Bundle): HomeTabFragment {
             val args = Bundle()
@@ -65,8 +59,9 @@ class HomeTabFragment : BaseFragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun init() {
-        titlesArr = arrayOf(GiphyApplication.getContext().getString(R.string.str_trending), GiphyApplication.getContext().getString(R.string.str_favourites))
-        fragmentsList = arrayOf(FragmentFactory.TRENDING_FRAGMENT, FragmentFactory.FAVOURITES_FRAGMENT)
+        titlesArr =
+            arrayOf(GiphyApplication.getContext().getString(R.string.str_trending), GiphyApplication.getContext().getString(R.string.str_favourites))
+        fragmentsList = arrayOf(FragmentFactory.TRENDING_FRAGMENT, FragmentFactory.TRENDING_FRAGMENT)
 
         val fragFactory = FragmentFactory()
 
@@ -74,8 +69,8 @@ class HomeTabFragment : BaseFragment() {
         fragmentsArr = arrayOfNulls(fragmentsList!!.size)
 
         for (i in fragmentsList!!.indices) {
-            val fragmentName = fragmentsList!!.get(i)
-            fragmentsArr!![i] = fragFactory.create(fragmentName,Bundle())
+            val fragmentName = fragmentsList!![i]
+            fragmentsArr!![i] = fragFactory.create(fragmentName, getBundles(i))
         }
 
         if (fragmentsList!!.size > 3) {
@@ -84,19 +79,15 @@ class HomeTabFragment : BaseFragment() {
             binding!!.tabLayout.tabMode = TabLayout.MODE_FIXED
         }
 
-        //since FragmentStatePagerAdapter is nested inside a Fragment, the FragmentManager is shared throughout all of them and thus retains instances of the old fragments.
-        // use childFrgamentManger instead of requireFragmentManager
         adapter = TabTemplateAdapter(this, titlesArr!!, fragmentsArr!!, fragFactory)//code related to viewpager2
 
         binding!!.viewPager.adapter = adapter
 
-        //code related to viewpager2
         TabLayoutMediator(binding!!.tabLayout, binding!!.viewPager) { tab, position ->
             tab.text = titlesArr?.get(position)
-
         }.attach()
 
-        val currentPage = 0//requireArguments().getInt(SET_CURRENT_PAGE, 0)
+        val currentPage = 0
         binding!!.viewPager.currentItem = currentPage
 
         binding!!.viewPager.offscreenPageLimit = titlesArr!!.size
@@ -128,6 +119,16 @@ class HomeTabFragment : BaseFragment() {
 
     fun getPublishTabChange(): Observable<Fragment> {
         return publishTabChange.hide()
+    }
+
+    private fun getBundles(position: Int): Bundle {
+        val bundle = Bundle()
+        if (position == 0) {
+            bundle.putBoolean("isTrending", true)
+        } else {
+            bundle.putBoolean("isTrending", false)
+        }
+        return bundle
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -7,6 +7,8 @@ class Constants {
 
     companion object{
 
+        const val API_KEY = "79JpxpypaQzogciYQs3VI9YNysNxGgJN"
+
         @JvmField
         var enableLog = true
 

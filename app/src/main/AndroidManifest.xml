@@ -11,10 +11,11 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ey_logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ey_logo"
         android:supportsRtl="true"
+        android:windowSoftInputMode="stateVisible"
         android:theme="@style/Theme.GiphyApp"
         tools:targetApi="31">
         <activity

@@ -15,16 +15,4 @@ data class MetaModel(
 
     @JsonProperty("response_id")
     var responseId:String
-) {
-
-
-    /*
-
-    "meta": {
-    "status": 200,
-    "msg": "OK",
-    "response_id": "b8l5rjibbordijkk47a507blyqgsv1tubnmu4r7g"
-  }
-
-    * */
-}
+)

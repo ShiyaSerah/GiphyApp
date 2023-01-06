@@ -19,4 +19,6 @@
     <string name="str_error_occurred">Some error occurred</string>
     <string name="str_trending">Trending</string>
     <string name="str_favourites">Favourites</string>
+    <string name="str_search">Search</string>
+    <string name="str_no_favorites">You have not added any gif\'s as favourite. Please add gif to favourites by clicking the icon on top-left corner.</string>
 </resources>

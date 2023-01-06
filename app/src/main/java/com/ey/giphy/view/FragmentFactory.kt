@@ -17,12 +17,12 @@ class FragmentFactory() : Parcelable {
         var frag = Fragment()
         when (fragmentId) {
             TRENDING_FRAGMENT -> {
-                frag = TrendingFragment.newInstance(bundle!!)
+                frag = GifListFragment.newInstance(bundle!!)
             }
-            FAVOURITES_FRAGMENT -> {
+           /* FAVOURITES_FRAGMENT -> {
                 frag = FavouritesFragment.newInstance(bundle!!)
 
-            }
+            }*/
         }
         return frag
     }
