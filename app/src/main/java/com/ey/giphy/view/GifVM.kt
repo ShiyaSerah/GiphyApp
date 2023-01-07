@@ -10,6 +10,7 @@ import com.ey.giphy.model.GiphyModel
 import com.ey.giphy.network.Resource
 import com.ey.giphy.network.Status
 import com.ey.giphy.repository.GiphyRepository
+import com.ey.giphy.utils.Logger
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +22,7 @@ class GifVM : BaseViewModel(GiphyApplication.getInstance()) {
     private val repository = GiphyRepository()
     private var observeGifs: PublishSubject<Resource<ArrayList<GiphyModel>>> = PublishSubject.create()
     private var observeInsert: PublishSubject<Resource<Long>> = PublishSubject.create()
+    private var observeStatusChange: PublishSubject<ArrayList<GiphyModel>> = PublishSubject.create()
     var isInitialTrendingCall = true
     var isInitialSearchCall = true
     var allGifList = ArrayList<GiphyModel>()
@@ -32,7 +34,7 @@ class GifVM : BaseViewModel(GiphyApplication.getInstance()) {
     var recyclerVisibility = ObservableField(View.VISIBLE)
     var isTrending = true
     var isSearchActivated = false
-    val newItemCount = 10
+    private val newItemCount = 10
 
     fun setLayout(isTrending: Boolean) {
         this.isTrending = isTrending
@@ -98,22 +100,23 @@ class GifVM : BaseViewModel(GiphyApplication.getInstance()) {
     }
 
     fun setFavouritesState(giphyModel: GiphyModel) = viewModelScope.launch(Dispatchers.IO) {
-        refreshAllGifList(giphyModel)
+        // refreshAllGifList(giphyModel)
         withContext(Dispatchers.Main) {
             observeInsert.onNext(Resource.loading(null))
         }
 
-        val baseResponse = repository.insertGifToDB(giphyModel)
+        val baseResponse = repository.insertOrReplaceGifToDB(giphyModel)
 
         withContext(Dispatchers.Main) {
             observeInsert.onNext(baseResponse)
         }
     }
 
-    fun refreshAllGifList(gifModel: GiphyModel) {
-        gifList.forEach { gif ->
-            if (gifModel.id == gif.id)
-                gif.isFavourite = gifModel.isFavourite
+    fun refreshAllGifList() = viewModelScope.launch(Dispatchers.IO) {
+        val favouriteList = repository.getGifIdFromDB()
+        repository.setFavouritesInGifList(allGifList, favouriteList)
+        withContext(Dispatchers.Main) {
+            observeStatusChange.onNext(allGifList)
         }
     }
 
@@ -143,6 +146,10 @@ class GifVM : BaseViewModel(GiphyApplication.getInstance()) {
         withContext(Dispatchers.Main) {
             observeGifs.onNext(resource)
         }
+    }
+
+    fun observeStatusChange(): Observable<ArrayList<GiphyModel>> {
+        return observeStatusChange.hide()
     }
 
     fun getNewGifList(): ArrayList<GiphyModel> {

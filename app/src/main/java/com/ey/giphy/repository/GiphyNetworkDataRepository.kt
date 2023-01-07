@@ -1,6 +1,7 @@
 package com.ey.giphy.repository
 
 import com.ey.giphy.constants.Constants
+import com.ey.giphy.model.GifIdFavModel
 import com.ey.giphy.model.GiphyBaseModel
 import com.ey.giphy.model.GiphyModel
 import com.ey.giphy.network.ApiServiceGenerator
@@ -33,13 +34,17 @@ class GiphyNetworkDataRepository : GiphyDataRepository {
     override suspend fun getFavouriteGifsFromDB(): ArrayList<GiphyModel> {
         TODO("Not yet implemented")    }
 
-    override suspend fun insertGifToDB(giphyModel: GiphyModel): Long {
+    override suspend fun insertOrReplaceGifToDB(giphyModel: GiphyModel): Long {
         TODO("Not yet implemented")    }
 
     override suspend fun getGifIdFromDB(): ArrayList<String> {
         TODO("Not yet implemented")    }
 
     override suspend fun getAllGifsFromDB(): ArrayList<GiphyModel> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getAllIdAndStatusFromDB(): ArrayList<GifIdFavModel> {
         TODO("Not yet implemented")
     }
 

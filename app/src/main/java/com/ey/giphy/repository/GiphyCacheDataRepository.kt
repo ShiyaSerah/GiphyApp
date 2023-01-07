@@ -1,5 +1,6 @@
 package com.ey.giphy.repository
 
+import com.ey.giphy.model.GifIdFavModel
 import com.ey.giphy.model.GiphyBaseModel
 import com.ey.giphy.model.GiphyModel
 
@@ -33,16 +34,20 @@ class GiphyCacheDataRepository : GiphyDataRepository {
         return roomDatabase!!.giphyDao().getAllGifs() as ArrayList<GiphyModel>
     }
 
-    override suspend fun insertGifToDB(giphyModel: GiphyModel): Long {
+    override suspend fun insertOrReplaceGifToDB(giphyModel: GiphyModel): Long {
         return roomDatabase!!.giphyDao().insertGif(giphyModel)
     }
 
     override suspend fun getGifIdFromDB(): ArrayList<String> {
-        return roomDatabase!!.giphyDao().getAllId() as ArrayList<String> /* = java.util.ArrayList<kotlin.String> */
+        return roomDatabase!!.giphyDao().getAllFavouriteId() as ArrayList<String> /* = java.util.ArrayList<kotlin.String> */
     }
 
     override suspend fun getAllGifsFromDB(): ArrayList<GiphyModel> {
         return roomDatabase!!.giphyDao().getAllGifs() as ArrayList<GiphyModel> /* = java.util.ArrayList<com.ey.giphy.model.GiphyModel> */
+    }
+
+    override suspend fun getAllIdAndStatusFromDB(): ArrayList<GifIdFavModel> {
+        return roomDatabase!!.giphyDao().getAllIdAndFavStatus() as ArrayList<GifIdFavModel>
     }
 
     override fun destroyInstances() {

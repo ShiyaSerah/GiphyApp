@@ -49,7 +49,6 @@ class GifListFragment : BaseFragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         initViews()
-        Logger.e(TAG, "inside onCreateView")
         return binding.root
 
     }
@@ -63,36 +62,42 @@ class GifListFragment : BaseFragment() {
 
     override fun onStart() {
         super.onStart()
-        Logger.e(TAG, "inside onStart")
         observeGifResponse()
 
         compositeDisposable.add(gifItemAdapter.getPublishFavourites().subscribe({
-            Logger.e(TAG, "inside success $it")
             viewModel.setFavouritesState(it)
-
-            if(!isTrending) viewModel.getFavouritesGif()
+            if (!isTrending) viewModel.getFavouritesGif()
         }, {
             Logger.e(TAG, it.message)
-            it.printStackTrace()
         }))
 
+        compositeDisposable.add(viewModel.observeStatusChange().subscribe(
+            {
+                gifItemAdapter.notifyDataSetChanged()
+
+            }, {
+                Logger.e(TAG, it.message)
+            })
+        )
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        Logger.e(TAG, "inside onViewStateRestored")
         gifItemAdapter.addAll(viewModel.allGifList)
 
     }
 
     override fun onResume() {
         super.onResume()
-        Logger.e(TAG, "inside onResume")
 
         if (isTrending) {
             if (viewModel.isSearchActivated && viewModel.isInitialSearchCall)
                 viewModel.searchGifByKeyword(binding.edtSearch.text.toString(), limit, viewModel.offset)
             else if (viewModel.isInitialTrendingCall && !viewModel.isSearchActivated) viewModel.getTrendingGifs(limit, viewModel.offset)
+            else {
+                //refresh the already available list
+                viewModel.refreshAllGifList()
+            }
         } else {
             viewModel.getFavouritesGif()
         }
@@ -131,7 +136,7 @@ class GifListFragment : BaseFragment() {
         })
 
         binding.edtSearch.onFocusChangeListener = View.OnFocusChangeListener { p0, isFocused ->
-            if(isFocused){
+            if (isFocused) {
                 val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.edtSearch, 0)
             }
@@ -152,8 +157,6 @@ class GifListFragment : BaseFragment() {
                     if (Utils.isOnline()) {
                         mIsLoading = true
                         // offset += 5
-                        Logger.e(tag, "" + viewModel.offset)
-
                         //if isInitialSearch is false then call search api for pagination otherwise call trending api
                         if (viewModel.isSearchActivated) viewModel.searchGifByKeyword(binding.edtSearch.text.toString(), limit, viewModel.offset)
                         else viewModel.getTrendingGifs(limit, viewModel.offset)
@@ -177,7 +180,7 @@ class GifListFragment : BaseFragment() {
             when (it!!.status) {
 
                 Status.LOADING -> {
-                   if(!viewModel.isSearchActivated) showNonDismissedDialog(getString(R.string.str_loading))
+                    if (!viewModel.isSearchActivated) showNonDismissedDialog(getString(R.string.str_loading))
                 }
                 Status.SUCCESS -> {
                     dismissProgressDialog()
@@ -196,7 +199,7 @@ class GifListFragment : BaseFragment() {
                             gifItemAdapter.notifyDataSetChanged()
                             viewModel.isInitialTrendingCall = false
                         }
-
+                        // gifList.addAll(viewModel.getNewGifList())
                         gifItemAdapter.addAll(viewModel.getNewGifList())
                         mIsLoading = false
                     } else {
@@ -207,12 +210,12 @@ class GifListFragment : BaseFragment() {
                 }
                 Status.ERROR -> {
                     dismissProgressDialog()
-                    //it.message!!.printStackTrace()
+                    Logger.e(TAG, it.message!!.message)
                 }
 
             }
         }, {
-            it.printStackTrace()
+            Logger.e(TAG, it.message)
         }))
     }
 
