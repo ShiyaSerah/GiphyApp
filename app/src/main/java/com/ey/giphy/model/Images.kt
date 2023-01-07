@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 data class Images(
-    @JsonProperty("fixed_width_small_still")
+    @JsonProperty("fixed_height_downsampled")
     @Embedded
     val imageProperties: ImageProperties? = null
 ) {

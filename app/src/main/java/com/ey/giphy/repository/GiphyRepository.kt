@@ -1,5 +1,6 @@
 package com.ey.giphy.repository
 
+import com.ey.giphy.model.GifIdFavModel
 import com.ey.giphy.model.GiphyBaseModel
 import com.ey.giphy.model.GiphyModel
 import com.ey.giphy.network.Resource
@@ -42,9 +43,9 @@ class GiphyRepository {
         }
     }
 
-    suspend fun insertGifToDB(giphyModel: GiphyModel): Resource<Long> {
+    suspend fun insertOrReplaceGifToDB(giphyModel: GiphyModel): Resource<Long> {
         return try {
-            val baseResponse = cacheDataRepository!!.insertGifToDB(giphyModel)
+            val baseResponse = cacheDataRepository!!.insertOrReplaceGifToDB(giphyModel)
             // if(null != baseResponse)
             Resource.success(baseResponse)
 
@@ -54,10 +55,9 @@ class GiphyRepository {
         }
     }
 
-    private fun setFavouritesInGifList(gifList: ArrayList<GiphyModel>, favouriteList: ArrayList<String>) {
+    fun setFavouritesInGifList(gifList: ArrayList<GiphyModel>, favouriteList: ArrayList<String>) {
         gifList.forEach { gif ->
-            if (favouriteList.any { fav -> gif.id == fav })
-                gif.isFavourite = true
+            gif.isFavourite = favouriteList.any { fav -> gif.id == fav }
         }
 
     }
@@ -76,8 +76,12 @@ class GiphyRepository {
 
     }
 
-    private suspend fun getGifIdFromDB(): ArrayList<String> {
+    suspend fun getGifIdFromDB(): ArrayList<String> {
         return cacheDataRepository!!.getGifIdFromDB()
+    }
+
+    suspend fun getIdAndFavouriteList():ArrayList<GifIdFavModel>{
+        return cacheDataRepository!!.getAllIdAndStatusFromDB()
     }
 
     fun destroyInstance() {

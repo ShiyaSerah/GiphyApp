@@ -10,7 +10,6 @@ import com.ey.giphy.GiphyApplication
 import com.ey.giphy.R
 import com.ey.giphy.databinding.ItemGifBinding
 import com.ey.giphy.model.GiphyModel
-import com.ey.giphy.utils.Logger
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
@@ -26,7 +25,7 @@ class GifItemAdapter(var gifItems: ArrayList<GiphyModel>) : RecyclerView.Adapter
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Glide.with(GiphyApplication.getContext())
-            .load(gifItems[holder.bindingAdapterPosition].images!!.imageProperties!!.url)
+            .load(gifItems[holder.absoluteAdapterPosition].images!!.imageProperties!!.url)
             .thumbnail(Glide.with(GiphyApplication.getContext()).load(R.drawable.loading))
             .fitCenter()
             .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
@@ -34,14 +33,12 @@ class GifItemAdapter(var gifItems: ArrayList<GiphyModel>) : RecyclerView.Adapter
             .into(holder.binding.imgGif)
 
 
-        holder.binding.checkFavourites.isChecked = gifItems[holder.bindingAdapterPosition].isFavourite
+        holder.binding.checkFavourites.isChecked = gifItems[holder.absoluteAdapterPosition].isFavourite
         holder.binding.checkFavourites.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener {
             override fun onCheckedChanged(p0: CompoundButton?, isChecked: Boolean) {
-                //if (isChecked) {
-                Logger.e("Adapter","inside onChecked $isChecked")
-                gifItems[holder.bindingAdapterPosition].isFavourite = isChecked
-                publishFavouriteChecked.onNext(gifItems[holder.bindingAdapterPosition])
-                //}
+                gifItems[holder.absoluteAdapterPosition].isFavourite = isChecked
+                publishFavouriteChecked.onNext(gifItems[holder.absoluteAdapterPosition])
+
             }
         })
 
